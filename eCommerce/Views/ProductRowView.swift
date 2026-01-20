@@ -21,7 +21,6 @@ struct ProductRowView: View {
                 Color.gray
             }
             .frame(width: 150, height: 150, alignment: .leading)
-            .background(.red)
              
             Spacer()
             
@@ -32,17 +31,23 @@ struct ProductRowView: View {
                     .fontWeight(.light)
                     .foregroundStyle(.black)
                 
-                Text(product.price?.description ?? String(0.0))
-                    .font(.default)
-                    .fontWeight(.light)
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: .infinity)
+                HStack {
+                    Spacer()
+                    
+                    Text("Price: \(product.price?.description ?? String(0.0))")
+                        .font(.default)
+                        .fontWeight(.light)
+                        .foregroundStyle(.black)
+                        .padding(.trailing, 15)
+                        .padding(.top, 10)
+                    
+                }
             }
-            .background(Color.accentColor)
+            
         }
     }
 }
 
 #Preview {
-    ProductRowView(product: Product())
+    //ProductRowView(product: Product())
 }

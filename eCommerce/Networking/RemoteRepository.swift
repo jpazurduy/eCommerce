@@ -26,11 +26,12 @@ class RemoteRepository: Repository {
 
     init() {
         self.sessionConfiguration = URLSessionConfiguration.default
-        self.sessionConfiguration.timeoutIntervalForRequest = 30.0
-        self.sessionConfiguration.timeoutIntervalForResource = 30.0
+        self.sessionConfiguration.timeoutIntervalForRequest = 20.0
+        self.sessionConfiguration.timeoutIntervalForResource = 20.0
         self.session = URLSession(configuration: self.sessionConfiguration)
     }
     
+    // TODO: - To test decoding errors
     func handleDecodingError(_ error: DecodingError) {
         switch error {
 
@@ -59,6 +60,7 @@ class RemoteRepository: Repository {
         }
     }
 
+    // TODO: - To test decoding errors 
     func codingPath(_ path: [CodingKey]) -> String {
         path.map { $0.stringValue }.joined(separator: " → ")
     }

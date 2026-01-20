@@ -28,6 +28,17 @@ struct ProductView: View {
                             ForEach(viewModelSearch.history, id: \.self) { item in
                                 Button(item) {
                                     searchText = item
+                                    let criteria = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    
+                                    guard !criteria.isEmpty else { return }
+                                    
+                                    Task {
+                                        do {
+                                            try await viewModel.fetchProducts(criteria: criteria)
+                                        } catch {
+                                            print(error.localizedDescription)
+                                        }
+                                    }
                                 }
                                 .foregroundColor(.primary)
                             }
@@ -64,7 +75,9 @@ struct ProductView: View {
         .onSubmit(of: .search) {
             viewModelSearch.addToHistory(searchText)
             let criteria = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            
             guard !criteria.isEmpty else { return }
+            
             Task {
                 do {
                     try await viewModel.fetchProducts(criteria: criteria)
