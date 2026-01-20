@@ -23,7 +23,6 @@ class ProductViewModel: ObservableObject {
         self.repository = repository
     }
     
-    // Starts a new search and loads page 1
     func fetchProducts(criteria: String) async throws {
         await MainActor.run {
             self.isLoading = true
@@ -45,14 +44,12 @@ class ProductViewModel: ObservableObject {
         }
     }
     
-    // Loads the next page if allowed
     @MainActor
     func loadNextPageIfNeeded(currentItem: Product?) {
         guard canLoadMore, !isLoadingPage, !isLoading else { return }
         guard let currentItem else { return }
         
-        // Trigger when the current item is within the last N items
-        let thresholdIndex = max(products.count - 5, 0)
+        let thresholdIndex = max(products.count - 15, 0)
         if let index = products.firstIndex(where: { $0.id == currentItem.id }), index >= thresholdIndex {
             Task {
                 try? await self.loadNextPage()
@@ -60,7 +57,6 @@ class ProductViewModel: ObservableObject {
         }
     }
     
-    // Actually performs the next page load
     private func loadNextPage() async throws {
         let nextPage = currentPage + 1
         await MainActor.run {
@@ -73,13 +69,11 @@ class ProductViewModel: ObservableObject {
                     self.canLoadMore = false
                 } else {
                     self.currentPage = nextPage
-                    // Avoid duplicates if backend can repeat items across pages
                     let existingIDs = Set(self.products.compactMap { $0.id })
                     let filtered = newItems.filter { item in
                         if let id = item.id {
                             return !existingIDs.contains(id)
                         } else {
-                            // If id is nil, append anyway
                             return true
                         }
                     }

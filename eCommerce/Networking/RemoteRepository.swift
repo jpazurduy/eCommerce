@@ -7,14 +7,6 @@
 
 import Foundation
 
-enum HttpMethod: String {
-    case get
-    case post
-    case put
-    case patch
-    case delete
-}
-
 enum WebError: Error {
     case requestFailed(Error)
     case serverError(statusCode: Int)
@@ -37,17 +29,6 @@ class RemoteRepository: Repository {
         self.sessionConfiguration.timeoutIntervalForRequest = 30.0
         self.sessionConfiguration.timeoutIntervalForResource = 30.0
         self.session = URLSession(configuration: self.sessionConfiguration)
-    }
-
-    private func printJSON(data: Data, path: String, method: HttpMethod) {
-        print()
-        print("\(method.rawValue.uppercased()): \(path)")
-        if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-            print(String(decoding: jsonData, as: UTF8.self))
-        } else {
-            print("JSON malformed data.")
-        }
     }
     
     func handleDecodingError(_ error: DecodingError) {
@@ -103,10 +84,9 @@ class RemoteRepository: Repository {
         }
         
         do {
-            self.printJSON(data: data, path: pathURL, method: .get)
             let decoder = JSONDecoder()
             let productResponse = try decoder.decode(ProductResponse.self, from: data)
-            // Flatten products from all item stacks
+            
             let stacks = productResponse.item.props.pageProps.initialData.searchResult.itemStacks
             let products = stacks.compactMap { $0.items }
             let fullProducts = products.flatMap { $0.elements }
